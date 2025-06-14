@@ -1,0 +1,34 @@
+Tareas para el Proyecto AI Reseller Bot
+
+1. Recopilar información de productos
+   : Obtener título, precio, ubicación, descripción, link y fotos de cada producto
+   - Automatizar la extracción de datos de las fuentes necesarias
+   - Validar y limpiar los datos recopilados
+
+2. Subir los datos a MongoDB en la nube
+   - Crear una base de datos y colección en MongoDB Atlas
+   - Configurar credenciales de acceso seguro
+   - Desarrollar el script para insertar los datos en MongoDB
+   - Verificar que los datos se suben correctamente
+
+3. Integrar MongoDB con n8n para procesamiento con IA
+   - Configurar la conexión de n8n con MongoDB
+   - Crear flujos (workflows) en n8n para procesar los datos
+   - Integrar módulos de IA en n8n para análisis o clasificación de productos
+
+4. Alertas de IA por Telegram
+   - Crear un bot de Telegram y obtener el token de acceso
+   - Configurar n8n para enviar mensajes a Telegram usando el bot
+   - Definir reglas para que la IA genere alertas relevantes
+
+5. Montar un servidor para ejecución 24/7
+   - Elegir un proveedor de hosting (ej: AWS, Heroku, DigitalOcean)
+   - Configurar el entorno del servidor (Python, dependencias, variables de entorno)
+   - Implementar un sistema de logs y monitoreo
+   - Automatizar el inicio del bot al reiniciar el servidor
+   - Asegurar la seguridad y el acceso remoto al servidor
+
+Opcional:
+   - Documentar el proceso y el código
+   - Realizar pruebas automáticas para cada módulo
+   - Configurar backups automáticos de la base de datos
