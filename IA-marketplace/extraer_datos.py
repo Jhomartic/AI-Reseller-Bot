@@ -2,8 +2,9 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 import time
 import re
+import json
 
-def extraer_datos(driver, max_productos=4):
+def extraer_datos(driver, max_productos=None):
     productos = driver.find_elements(By.CSS_SELECTOR, ".x9f619.x78zum5.x1r8uery.xdt5ytf.x1iyjqo2.xs83m0k.x135b78x.x11lfxj5.x1iorvi4.xjkvuk6.xnpuxes.x1cjf5ee.x17dddeq")
     links = get_links(productos, max_productos)      
     lista_productos = []
@@ -21,14 +22,14 @@ def extraer_datos(driver, max_productos=4):
           "titulo": titulo,
           "precio": precio,
           "descripcion": descrip,
-          "imagenes": imagenes,  # <-- sin llaves
+          "imagenes": imagenes,
           "link": link
         })
+    lista_productos = json.dumps(lista_productos, ensure_ascii=False, indent=2)    
+    with open("productos.json", "w", encoding="utf-8") as f:
+       f.write(lista_productos)
         
     return lista_productos    
-        
-
-
 
 def get_links(productos, max_productos):
     links = []
@@ -50,7 +51,7 @@ def get_titulo(driver):
 
 def get_precio(driver):
     try:
-        precio = driver.find_element(By.CSS_SELECTOR, "span.x1lliihq.x1n2onr6.x1q0g3np").text
+        precio = driver.find_element(By.CSS_SELECTOR, "div.x1xmf6yo span.x193iq5w.xeuugli.x13faqbe.x1vvkbs.x1xmvt09.x1lliihq.x1s928wv.xhkezso.x1gmr53x.x1cpjm7i.x1fgarty.x1943h6x.xudqn12.x676frb.x1lkfr7t.x1lbecb7.xk50ysn.xzsf02u").text
         precio = limpiar_precio(precio)
     except NoSuchElementException:
         precio = "No hay precio"
@@ -72,7 +73,7 @@ def limpiar_precio(precio_str):
 
 def get_descripcion(driver):
     try:
-        descrip = driver.find_element(By.CSS_SELECTOR, "div.x1iorvi4.x1n2onr6.x1q0g3np").text
+        descrip = driver.find_element(By.CSS_SELECTOR, "div.x9f619.x1n2onr6 div.x9f619.x1n2onr6 div.xz9dl7a.xyri2b div span.xo1l8bm").text
     except NoSuchElementException:
         descrip = "No hay descripcion"
     return descrip
