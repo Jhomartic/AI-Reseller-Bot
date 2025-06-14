@@ -61,15 +61,15 @@ def limpiar_precio(precio_str):
     precio_str = precio_str.lower()
     if "gratis" in precio_str:
         return "No puso precio"
-    # Extrae solo los dígitos
-    numeros = re.findall(r'\d+', precio_str)
-    if not numeros:
+    # Busca el primer grupo de dígitos y puntos (para miles)
+    match = re.search(r'(\d{1,3}(?:[.\s]\d{3})*)', precio_str)
+    if not match:
         return None
-    precio = int(''.join(numeros))
+    # Limpia puntos y espacios, convierte a int
+    precio = int(match.group(1).replace('.', '').replace(' ', ''))
     if precio < 1000:
         precio *= 1000
-        
-    return precio  
+    return precio
 
 def get_descripcion(driver):
     try:
