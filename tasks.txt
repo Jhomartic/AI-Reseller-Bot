@@ -1,7 +1,7 @@
 Tareas para el Proyecto AI Reseller Bot
 
 1. Recopilar información de productos
-   : Obtener título, precio, ubicación, descripción, link y fotos de cada producto
+   ✅Obtener título, precio, descripción, link y fotos de cada producto
    - Automatizar la extracción de datos de las fuentes necesarias
    - Validar y limpiar los datos recopilados
 
