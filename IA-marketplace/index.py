@@ -11,7 +11,7 @@ def scrapear_marketplace():
     #     # for _ in range(1):
     #     #     driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
     #     #     time.sleep(6)
-    extraer_datos(driver, 10)  
+    extraer_datos(driver, 1)  
             
       
 

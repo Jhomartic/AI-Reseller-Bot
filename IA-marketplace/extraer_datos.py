@@ -73,7 +73,7 @@ def limpiar_precio(precio_str):
 
 def get_descripcion(driver):
     try:
-        descrip = driver.find_element(By.CSS_SELECTOR, "div.x9f619.x1n2onr6 div.x9f619.x1n2onr6 div.xz9dl7a.xyri2b div span.xo1l8bm").text
+        descrip = driver.find_element(By.CSS_SELECTOR, "div.x9f619.x1n2onr6 div.xz9dl7a.xyri2b div span.xo1l8bm").text
     except NoSuchElementException:
         descrip = "No hay descripcion"
     return descrip
