@@ -8,17 +8,19 @@ def extraer_datos(driver, max_productos=None):
     productos = driver.find_elements(By.CSS_SELECTOR, ".x9f619.x78zum5.x1r8uery.xdt5ytf.x1iyjqo2.xs83m0k.x135b78x.x11lfxj5.x1iorvi4.xjkvuk6.xnpuxes.x1cjf5ee.x17dddeq")
     links = get_links(productos, max_productos)      
     lista_productos = []
-    for link in links:
+    for indx, link in enumerate(links, start=1):
         driver.get(link)
         
-        time.sleep(4)
         
+        time.sleep(4)
+        ## enumerar productos
         titulo = get_titulo(driver)
         precio = get_precio(driver)
         descrip = get_descripcion(driver)
         imagenes = get_imagenes(driver)
         
         lista_productos.append({
+          "id": indx,  
           "titulo": titulo,
           "precio": precio,
           "descripcion": descrip,
