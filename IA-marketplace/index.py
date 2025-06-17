@@ -10,10 +10,9 @@ def scrapear_marketplace():
     if driver:
       driver.get("https://www.facebook.com/marketplace/category/cell-phones")
       time.sleep(2)   
-    #   hacer scroll para cargar mas productos
     # Tiempo de duracion haciendo 20 scrolls 2:16s
-      scroll_hasta_mas_resultados(driver)
-    # extraer_datos(driver)  
+      # scroll_hasta_mas_resultados(driver)
+      extraer_datos(driver)  
     
 def scroll_hasta_mas_resultados(driver):
     while True:

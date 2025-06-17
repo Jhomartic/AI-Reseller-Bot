@@ -1,48 +1,49 @@
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
-import time
-import re
-import json
+import time, re, json, os, datetime
+
 
 def extraer_datos(driver, max_productos=None):
     productos = driver.find_elements(By.CSS_SELECTOR, ".x9f619.x78zum5.x1r8uery.xdt5ytf.x1iyjqo2.xs83m0k.x135b78x.x11lfxj5.x1iorvi4.xjkvuk6.xnpuxes.x1cjf5ee.x17dddeq")
-    links = get_links(productos, max_productos)      
-    lista_productos = []
-    for indx, link in enumerate(links, start=1):
-        driver.get(link)
-        
-        
-        time.sleep(4)
-        ## enumerar productos
-        titulo = get_titulo(driver)
-        precio = get_precio(driver)
-        descrip = get_descripcion(driver)
-        imagenes = get_imagenes(driver)
-        
-        lista_productos.append({
-          "id": indx,  
-          "titulo": titulo,
-          "precio": precio,
-          "descripcion": descrip,
-          "imagenes": imagenes,
-          "link": link
-        })
-    lista_productos = json.dumps(lista_productos, ensure_ascii=False, indent=2)    
-    with open("productos.json", "w", encoding="utf-8") as f:
-       f.write(lista_productos)
-        
-    return lista_productos    
+    links = get_links(productos, max_productos) 
+    lista_productos = get_products(driver, links)  
 
-def get_links(productos, max_productos):
+    return lista_productos 
+      
+
+def get_links(productos, max_productos=None):
+    # Lee los links existentes desde links.json (si existe)
+    if os.path.exists("links.json"):
+        with open("links.json", "r", encoding="utf-8") as f:
+            links_guardados = json.load(f)
+    else:
+        links_guardados = []
+
     links = []
-    for producto in productos[:max_productos]:
+    productos_a_procesar = productos if max_productos is None else productos[:max_productos]
+    for producto in productos_a_procesar:
         try:
             link = producto.find_element(By.CSS_SELECTOR, "a").get_attribute("href")
-            if "facebook.com/marketplace/item/" in link:
-              links.append(link)  
+            if link and "facebook.com/marketplace/item/" in link and link not in links_guardados and link not in links:
+                link = limpiar_link(link)
+                links.append(link)
         except NoSuchElementException:
-            continue 
-    return links    
+            continue
+
+    # Une los links antiguos y los nuevos, sin duplicados
+    todos_los_links = links_guardados + [l for l in links if l not in links_guardados]
+
+    # Guarda la lista actualizada en links.json
+    with open("links.json", "w", encoding="utf-8") as f:
+        json.dump(todos_los_links, f, ensure_ascii=False, indent=2)
+
+    return links
+
+def limpiar_link(link):
+    match = re.search(r"(https://www\.facebook\.com/marketplace/item/\d+)", link)
+    if match:
+        return match.group(1)
+    return link
 
 def get_titulo(driver):
     try:
@@ -91,3 +92,45 @@ def get_imagenes(driver):
     except NoSuchElementException:
         imagenes_urls = []
     return imagenes_urls
+
+def get_products(driver, links):
+    
+    if os.path.exists("productos.json"):
+        with open("productos.json", "r", encoding="utf-8") as f:
+            productos_guardados = json.load(f)
+    else:
+      productos_guardados = []
+      
+    links_guardados = set(p["link"] for p in productos_guardados)  
+        
+    productos_nuevos = []
+    for link in links:
+        if link in links_guardados:
+            continue
+        driver.get(link)
+        time.sleep(5)  # Espera a que la página cargue
+        
+        producto = {
+            "titulo": get_titulo(driver),
+            "precio": get_precio(driver),
+            "descripcion": get_descripcion(driver),
+            "imagenes": get_imagenes(driver),
+            "link": link,
+            "fecha_scraping": datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+        }
+        
+        productos_nuevos.append(producto)
+        
+    lista_productos = productos_guardados + productos_nuevos
+    ## imprimir cantidad de prodcutos nuevos
+    if productos_nuevos:
+        print(f"Se encontraron {len(productos_nuevos)} productos nuevos.")
+    else:
+        print("No se encontraron productos nuevos.")
+    
+    print(f"Total de productos guardados: {len(lista_productos)}")    
+    
+    with open("productos.json", "w", encoding="utf-8") as f:
+      json.dump(lista_productos, f, ensure_ascii=False, indent=2)
+      
+    return lista_productos
