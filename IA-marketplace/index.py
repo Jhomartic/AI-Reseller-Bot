@@ -12,7 +12,7 @@ def scrapear_marketplace():
       time.sleep(2)   
     # Tiempo de duracion haciendo 20 scrolls 2:16s
       # scroll_hasta_mas_resultados(driver)
-      extraer_datos(driver)  
+      extraer_datos(driver, 4)  
     
 def scroll_hasta_mas_resultados(driver):
     while True:

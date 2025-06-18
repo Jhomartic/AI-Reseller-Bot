@@ -23,6 +23,13 @@ def get_links(productos, max_productos=None):
     productos_a_procesar = productos if max_productos is None else productos[:max_productos]
     for producto in productos_a_procesar:
         try:
+             # Ajusta el selector según el HTML real de la ubicación
+            ubicacion = producto.find_element(By.CSS_SELECTOR, "div.x1gslohp.xkh6y0r div.x1iorvi4 span.x4zkp8e.x3x7a5m").text.lower()
+            print(ubicacion)
+            if ubicacion and "cartagena de indias" not in ubicacion:
+                print(f"Producto omitido, ubicación no es Cartagena de Indias: {ubicacion}")
+                continue  # Salta si no es de Cartagena de Indias
+            
             link = producto.find_element(By.CSS_SELECTOR, "a").get_attribute("href")
             if link and "facebook.com/marketplace/item/" in link and link not in links_guardados and link not in links:
                 link = limpiar_link(link)
