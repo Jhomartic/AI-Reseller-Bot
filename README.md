@@ -1,28 +1,25 @@
-# 🤖 AI-Reseller-Bot - Detector Inteligente de Ofertas en Facebook Marketplace
+# 🤖 AI-Reseller-Bot
 
-**AI-Reseller-Bot** es una herramienta automática con inteligencia artificial diseñada para escanear publicaciones de celulares en Facebook Marketplace, identificar precios bajos y ayudarte a encontrar oportunidades de compra y reventa en tiempo real.
+Herramienta inteligente para detectar celulares a precios bajos en Facebook Marketplace usando scraping y análisis automatizado.
 
----
+## 🚀 Tecnologías
+- Python
+- Selenium + BeautifulSoup
+- IA básica para detección de precios
 
-## 🚀 Características
+## 🛠️ Funcionalidades
+- Escaneo automatizado de publicaciones
+- Detección de oportunidades de reventa
+- Almacenamiento y limpieza diaria de datos
 
-- 🧠 Inicio de sesión mediante cookies (evita CAPTCHA).
-- 🔍 Navegación automática por Marketplace.
-- 📥 Extracción de datos clave:
-  - Precio
-  - Modelo de celular
-  - Ubicación
-- 🧠 IA o lógica de reglas para identificar ofertas atractivas.
-- 🧹 Limpieza de datos incompletos o repetidos.
-- 💾 Almacenamiento local de resultados.
+## 📦 Uso
+1. Clona el repositorio
+2. Instala los requisitos
+3. Ejecuta el bot con tus credenciales de sesión
 
----
-
-## ⚙️ Requisitos
-
-- Python 3.10 o superior
-- Google Chrome instalado
-- [ChromeDriver 137](https://googlechromelabs.github.io/chrome-for-testing/)
+## 📍 Estado actual
+Versión en desarrollo. Enfocada en productos en Colombia 🇨🇴
+ub.io/chrome-for-testing/)
 - Cuenta de Facebook activa
 
 ---
