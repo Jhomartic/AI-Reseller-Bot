@@ -3,54 +3,47 @@ from selenium.common.exceptions import NoSuchElementException
 import time, re, json, os, datetime
 
 
-def extraer_datos(driver, max_productos=None):
-    productos = driver.find_elements(By.CSS_SELECTOR, ".x9f619.x78zum5.x1r8uery.xdt5ytf.x1iyjqo2.xs83m0k.x135b78x.x11lfxj5.x1iorvi4.xjkvuk6.xnpuxes.x1cjf5ee.x17dddeq")
-    links = get_links(productos, max_productos) 
+def extraer_datos(driver, links):
     lista_productos = get_products(driver, links)  
-
     return lista_productos 
       
 
-def get_links(productos, max_productos=None):
-    # Lee los links existentes desde links.json (si existe)
-    if os.path.exists("links.json"):
-        with open("links.json", "r", encoding="utf-8") as f:
-            links_guardados = json.load(f)
-    else:
-        links_guardados = []
-
-    links = []
-    productos_a_procesar = productos if max_productos is None else productos[:max_productos]
-    for producto in productos_a_procesar:
-        try:
-             # Ajusta el selector según el HTML real de la ubicación
-            ubicacion = producto.find_element(By.CSS_SELECTOR, "div.x1gslohp.xkh6y0r div.x1iorvi4 span.x4zkp8e.x3x7a5m").text.lower()
-            print(ubicacion)
-            if ubicacion and "cartagena de indias" not in ubicacion:
-                print(f"Producto omitido, ubicación no es Cartagena de Indias: {ubicacion}")
-                continue  # Salta si no es de Cartagena de Indias
-            
-            link = producto.find_element(By.CSS_SELECTOR, "a").get_attribute("href")
-            if link and "facebook.com/marketplace/item/" in link and link not in links_guardados and link not in links:
-                link = limpiar_link(link)
-                links.append(link)
-        except NoSuchElementException:
+def get_products(driver, links):
+    productos_guardados = cargar_productos_json()
+    links_guardados = set(p["link"] for p in productos_guardados)  
+    productos_nuevos = []
+    for link in links:
+        if link in links_guardados:
             continue
+        driver.get(link)
+        time.sleep(5)  # Espera a que la página cargue
+        
+        producto = {
+            "titulo": get_titulo(driver),
+            "precio": get_precio(driver),
+            "descripcion": get_descripcion(driver),
+            "imagenes": get_imagenes(driver),
+            "link": link,
+            "fecha_scraping": datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+        }
+        
+        productos_nuevos.append(producto)
+        
+    lista_productos = productos_guardados + productos_nuevos
+    
+    guardar_productos_json(lista_productos)
+    ## imprimir cantidad de prodcutos nuevos
+    if productos_nuevos:
+        print(f"Se encontraron {len(productos_nuevos)} productos nuevos.")
+    else:
+        print("No se encontraron productos nuevos.")
+    
+    print(f"Total de productos guardados: {len(lista_productos)}")     
+      
+    return lista_productos
 
-    # Une los links antiguos y los nuevos, sin duplicados
-    todos_los_links = links_guardados + [l for l in links if l not in links_guardados]
 
-    # Guarda la lista actualizada en links.json
-    with open("links.json", "w", encoding="utf-8") as f:
-        json.dump(todos_los_links, f, ensure_ascii=False, indent=2)
 
-    return links
-
-def limpiar_link(link):
-    match = re.search(r"(https://www\.facebook\.com/marketplace/item/\d+)", link)
-    if match:
-        return match.group(1)
-    return link
 
 def get_titulo(driver):
     try:
@@ -100,44 +93,15 @@ def get_imagenes(driver):
         imagenes_urls = []
     return imagenes_urls
 
-def get_products(driver, links):
-    
+def cargar_productos_json():
     if os.path.exists("productos.json"):
         with open("productos.json", "r", encoding="utf-8") as f:
-            productos_guardados = json.load(f)
+            productos = json.load(f)
     else:
-      productos_guardados = []
+      productos = []
       
-    links_guardados = set(p["link"] for p in productos_guardados)  
-        
-    productos_nuevos = []
-    for link in links:
-        if link in links_guardados:
-            continue
-        driver.get(link)
-        time.sleep(5)  # Espera a que la página cargue
-        
-        producto = {
-            "titulo": get_titulo(driver),
-            "precio": get_precio(driver),
-            "descripcion": get_descripcion(driver),
-            "imagenes": get_imagenes(driver),
-            "link": link,
-            "fecha_scraping": datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
-        }
-        
-        productos_nuevos.append(producto)
-        
-    lista_productos = productos_guardados + productos_nuevos
-    ## imprimir cantidad de prodcutos nuevos
-    if productos_nuevos:
-        print(f"Se encontraron {len(productos_nuevos)} productos nuevos.")
-    else:
-        print("No se encontraron productos nuevos.")
-    
-    print(f"Total de productos guardados: {len(lista_productos)}")    
-    
+    return productos
+
+def guardar_productos_json(productos):
     with open("productos.json", "w", encoding="utf-8") as f:
-      json.dump(lista_productos, f, ensure_ascii=False, indent=2)
-      
-    return lista_productos
+      json.dump(productos, f, ensure_ascii=False, indent=2)
