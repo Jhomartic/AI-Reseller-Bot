@@ -6,19 +6,10 @@ from scroll import hacer_scroll
 
 
 
-def obtener_links(driver, max_productos=None, max_scrolls=None):
-   scroll_count = 0
+def obtener_todos_links(driver):
    while True:
-       links = filtrar_links(driver, max_productos)
+       links = filtrar_links(driver)
        guardar_links_json(links)  # Esta función debe actualizar links.json sin duplicados
-       if max_scrolls == 0:
-        print("max_scrolls es 0, no se hace scroll.")
-        break
-        # Condición para max_scrolls > 0
-       if max_scrolls is not None and max_scrolls > 0:
-          if scroll_count >= max_scrolls:
-            print("Se alcanzó el máximo de scrolls.")
-            break
        try:
             # Busca el texto "Más resultados fuera de tu zona"
             driver.find_element(By.XPATH, "//*[contains(text(), 'Más resultados fuera de tu zona')]")
@@ -27,27 +18,23 @@ def obtener_links(driver, max_productos=None, max_scrolls=None):
             break
        except NoSuchElementException:
             hacer_scroll(driver)
-            scroll_count += 1
-            time.sleep(2) 
-                       
+            time.sleep(2)  # Espera un poco antes de seguir haciendo scroll
    return links    
 
 
 
 
-def filtrar_links(driver, max_productos=None):
+def filtrar_links(driver):
     
-    producto = driver.find_elements(By.CSS_SELECTOR, ".x9f619.x78zum5.x1r8uery.xdt5ytf.x1iyjqo2.xs83m0k.x135b78x.x11lfxj5.x1iorvi4.xjkvuk6.xnpuxes.x1cjf5ee.x17dddeq")
+    productos_html = driver.find_elements(By.CSS_SELECTOR, ".x9f619.x78zum5.x1r8uery.xdt5ytf.x1iyjqo2.xs83m0k.x135b78x.x11lfxj5.x1iorvi4.xjkvuk6.xnpuxes.x1cjf5ee.x17dddeq")
     # Lee los links existentes desde links.json (si existe)
     links_guardados = cargar_links_json()
     
     links = []
-    productos_a_procesar = producto if max_productos is None else producto[:max_productos]
-    for producto in productos_a_procesar:
+    for producto in productos_html:
         try:
              # Ajusta el selector según el HTML real de la ubicación
             ubicacion = producto.find_element(By.CSS_SELECTOR, "div.x1gslohp.xkh6y0r div.x1iorvi4 span.x4zkp8e.x3x7a5m").text.lower()
-            print(ubicacion)
             if ubicacion and "cartagena de indias" not in ubicacion:
                 print(f"Producto omitido, ubicación no es Cartagena de Indias: {ubicacion}")
                 continue  # Salta si no es de Cartagena de Indias

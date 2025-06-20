@@ -1,36 +1,27 @@
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
-import time, re, json, os, datetime
+import time, re, json, os, datetime, random
+from obtener_links import cargar_links_json 
 
-
-def extraer_datos(driver, links):
-    lista_productos = get_products(driver, links)  
-    return lista_productos 
-      
-
-def get_products(driver, links):
+def get_products(driver, max_productos=None):
+    links = cargar_links_json()
     productos_guardados = cargar_productos_json()
     links_guardados = set(p["link"] for p in productos_guardados)  
-    productos_nuevos = []
-    for link in links:
-        if link in links_guardados:
-            continue
-        driver.get(link)
-        time.sleep(5)  # Espera a que la página cargue
-        
-        producto = {
-            "titulo": get_titulo(driver),
-            "precio": get_precio(driver),
-            "descripcion": get_descripcion(driver),
-            "imagenes": get_imagenes(driver),
-            "link": link,
-            "fecha_scraping": datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
-        }
-        
-        productos_nuevos.append(producto)
-        
-    lista_productos = productos_guardados + productos_nuevos
     
+    # Filtra los links para que solo queden los que NO están guardados
+    links_nuevos = [link for link in links if link not in links_guardados]
+    
+      # Si max_productos está definido, solo toma esa cantidad
+    if max_productos is not None:
+        links_nuevos = links_nuevos[:max_productos]
+    
+    
+    productos_nuevos = []
+    for link in links_nuevos:
+        if link in links_guardados: continue
+        productos_nuevos.append(get_producto(link, driver))
+           
+    lista_productos = productos_guardados + productos_nuevos
     guardar_productos_json(lista_productos)
     ## imprimir cantidad de prodcutos nuevos
     if productos_nuevos:
@@ -38,12 +29,30 @@ def get_products(driver, links):
     else:
         print("No se encontraron productos nuevos.")
     
-    print(f"Total de productos guardados: {len(lista_productos)}")     
-      
-    return lista_productos
+    print(f"Total de productos guardados: {len(lista_productos)}")  
+    
+    return productos_nuevos   
 
 
 
+def get_producto(link, driver):
+    driver.get(link)
+    time.sleep(random.uniform(4, 7)) 
+        
+    producto = {
+        "titulo": get_titulo(driver),
+        "precio": get_precio(driver),
+        "descripcion": get_descripcion(driver),
+        "imagenes": get_imagenes(driver),
+        "link": link,
+        "fecha_scraping": datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+    }
+    
+    return producto
+        
+        
+       
+        
 
 def get_titulo(driver):
     try:

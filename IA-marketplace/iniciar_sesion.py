@@ -1,8 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
-import os
-import pickle
-import time
+import os, pickle, random, time
 
 COOKIES_FILE = "facebook_cookies.pkl"
 CHROMEDRIVER_PATH = r"C:\drivers\chromedriver.exe"
@@ -11,9 +9,12 @@ def iniciarSesion():
     if not os.path.exists(COOKIES_FILE):
         print("No hay cookies guardadas.")
         login_manual_y_guardar_cookies()
+        
         return None
     else:
         driver = acceder_con_cookies()
+        driver.get("https://www.facebook.com/marketplace/category/cell-phones")
+        time.sleep(random.uniform(2, 4))   
         return driver
 
 def guardar_cookies(driver, COOKIES_FILE):
