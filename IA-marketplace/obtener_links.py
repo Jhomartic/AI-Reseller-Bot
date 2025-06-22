@@ -4,7 +4,10 @@ import  re, json, os
 import time
 from scroll import hacer_scroll
 
-
+LINKS_JSON = "links.json"
+SELECTOR_PRODUCTO = ".x9f619.x78zum5.x1r8uery.xdt5ytf.x1iyjqo2.xs83m0k.x135b78x.x11lfxj5.x1iorvi4.xjkvuk6.xnpuxes.x1cjf5ee.x17dddeq"
+SELECTOR_UBICACION = "div.x1gslohp.xkh6y0r div.x1iorvi4 span.x4zkp8e.x3x7a5m"
+CIUDAD = "cartagena de indias"
 
 def obtener_todos_links(driver):
    while True:
@@ -18,7 +21,6 @@ def obtener_todos_links(driver):
             break
        except NoSuchElementException:
             hacer_scroll(driver)
-            time.sleep(2)  # Espera un poco antes de seguir haciendo scroll
    return links    
 
 
@@ -26,7 +28,7 @@ def obtener_todos_links(driver):
 
 def filtrar_links(driver):
     
-    productos_html = driver.find_elements(By.CSS_SELECTOR, ".x9f619.x78zum5.x1r8uery.xdt5ytf.x1iyjqo2.xs83m0k.x135b78x.x11lfxj5.x1iorvi4.xjkvuk6.xnpuxes.x1cjf5ee.x17dddeq")
+    productos_html = driver.find_elements(By.CSS_SELECTOR, SELECTOR_PRODUCTO)
     # Lee los links existentes desde links.json (si existe)
     links_guardados = cargar_links_json()
     
@@ -34,9 +36,9 @@ def filtrar_links(driver):
     for producto in productos_html:
         try:
              # Ajusta el selector según el HTML real de la ubicación
-            ubicacion = producto.find_element(By.CSS_SELECTOR, "div.x1gslohp.xkh6y0r div.x1iorvi4 span.x4zkp8e.x3x7a5m").text.lower()
-            if ubicacion and "cartagena de indias" not in ubicacion:
-                print(f"Producto omitido, ubicación no es Cartagena de Indias: {ubicacion}")
+            ubicacion = producto.find_element(By.CSS_SELECTOR, SELECTOR_UBICACION).text.lower()
+            if ubicacion and CIUDAD not in ubicacion:
+                print(f"Producto omitido, ubicación no es {CIUDAD}: {ubicacion}")
                 continue  # Salta si no es de Cartagena de Indias
             
             link = producto.find_element(By.CSS_SELECTOR, "a").get_attribute("href")
@@ -65,8 +67,8 @@ def limpiar_link(link):
 
 
 def cargar_links_json():
-    if os.path.exists("links.json"):
-        with open("links.json", "r", encoding="utf-8") as f:
+    if os.path.exists(LINKS_JSON):
+        with open(LINKS_JSON, "r", encoding="utf-8") as f:
             links = json.load(f)
     else:
         links = []
@@ -74,6 +76,6 @@ def cargar_links_json():
     return links 
 
 def guardar_links_json(links):
-    with open("links.json", "w", encoding="utf-8") as f:
+    with open(LINKS_JSON, "w", encoding="utf-8") as f:
         json.dump(links, f, ensure_ascii=False, indent=2)
 

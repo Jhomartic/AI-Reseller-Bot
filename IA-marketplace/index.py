@@ -1,12 +1,12 @@
-from iniciar_sesion import iniciarSesion
+from iniciar_sesion import iniciarSesion_facebook
 from extraer_datos import get_products
 from obtener_links import obtener_todos_links
-import random, time, schedule
+import random, time
 
 
 def scrapear_marketplace(max_productos=None):
     ## Iniciar sesión en Facebook y obtener el driver
-    driver = iniciarSesion()
+    driver = iniciarSesion_facebook()
     while True:
         # 1. Obtener todos los links actuales
         links = obtener_todos_links(driver)
@@ -26,17 +26,15 @@ def scrapear_marketplace(max_productos=None):
             if not nuevos:
                 print("¡Todos los productos han sido guardados!")
                 break
-            espera = random.randint(15, 20) * 60
+            espera = random.randint(9, 15) * 60
             print(f"Esperando {espera//60} minutos para la próxima tanda...")
             time.sleep(espera)
-
-        # 3. Espera antes de volver a obtener todos los links (para detectar productos nuevos)
-        print("Esperando 10 minutos antes de volver a buscar nuevos productos...")
-        time.sleep(600)  # Espera 10 minutos antes de volver a scrapear links
+            
+        driver.get("https://www.facebook.com/marketplace/category/cell-phones")    
 
 
 if __name__ == "__main__":
-    scrapear_marketplace(max_productos=random.randint(80, 100))  # Puedes ajustar el rango según tus necesidades
+    scrapear_marketplace(max_productos=random.randint(90, 100))  # Puedes ajustar el rango según tus necesidades
     
 
    
